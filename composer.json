@@ -1,6 +1,6 @@
 {
-    "name": "kapitchi/identity",
-    "description": "Generic entity API and revision system.",
+    "name": "kapitchi/entity",
+    "description": "Generic entity API and entity revision control.",
     "keywords": [
         "kapitchi",
         "zf2",
