@@ -33,6 +33,10 @@ abstract class AbstractEntityController extends AbstractActionController
     {
         $pageNumber = $this->getCurrentPageNumber();
         
+        $this->getEventManager()->trigger('index.pre', $this, array(
+            'pageNumber' => $pageNumber,
+        ));
+        
         $paginator = $this->getEntityService()->getPaginator();
         $paginator->setCurrentPageNumber($pageNumber);
         
@@ -41,7 +45,7 @@ abstract class AbstractEntityController extends AbstractActionController
             'paginator' => $paginator,
         ));
         
-        $this->getEventManager()->trigger('view.post', $this, array(
+        $this->getEventManager()->trigger('index.post', $this, array(
             'viewModel' => $viewModel,
         ));
         

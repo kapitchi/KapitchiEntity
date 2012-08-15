@@ -17,13 +17,13 @@ class EntityRestfulController extends AbstractRestfulController {
         }
     }
     
-    public function execute(MvcEvent $event)
+    public function onDispatch(MvcEvent $event)
     {
         $ret = array(
             'error' => true,
         );
         try {
-            return parent::execute($event);
+            return parent::onDispatch($event);
         } catch(\KapitchiEntity\Service\Exception\ValidationException $e) {
             $ret['errorMsg'] = $e->getMessage();
             $ret['errorType'] = 'validation';
@@ -55,7 +55,7 @@ class EntityRestfulController extends AbstractRestfulController {
         );
         
         $jsonModel = new JsonModel($ret);
-        $this->getEventManager()->trigger('create', $this, array(
+        $this->getEventManager()->trigger('create.post', $this, array(
             'jsonViewModel' => $jsonModel
         ));
         return $jsonModel;
@@ -66,7 +66,7 @@ class EntityRestfulController extends AbstractRestfulController {
         $ret = $service->remove($id);
         
         $jsonModel = new JsonModel($ret);
-        $this->getEventManager()->trigger('delete', $this, array(
+        $this->getEventManager()->trigger('delete.post', $this, array(
             'jsonViewModel' => $jsonModel
         ));
         return $jsonModel;
@@ -84,7 +84,7 @@ class EntityRestfulController extends AbstractRestfulController {
         );
         
         $jsonModel = new JsonModel($ret);
-        $this->getEventManager()->trigger('get', $this, array(
+        $this->getEventManager()->trigger('get.post', $this, array(
             'jsonViewModel' => $jsonModel
         ));
         return $jsonModel;
@@ -108,7 +108,7 @@ class EntityRestfulController extends AbstractRestfulController {
         );
         
         $jsonModel = new JsonModel($ret);
-        $this->getEventManager()->trigger('getList', $this, array(
+        $this->getEventManager()->trigger('getList.post', $this, array(
             'jsonViewModel' => $jsonModel
         ));
         return $jsonModel;
@@ -130,7 +130,7 @@ class EntityRestfulController extends AbstractRestfulController {
         );
         
         $jsonModel = new JsonModel($ret);
-        $this->getEventManager()->trigger('update', $this, array(
+        $this->getEventManager()->trigger('update.post', $this, array(
             'jsonViewModel' => $jsonModel
         ));
         return $jsonModel;

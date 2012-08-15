@@ -5,7 +5,6 @@ use Zend\Stdlib\Hydrator\HydratorInterface as EntityHydrator,
     Zend\Paginator\Paginator,
     KapitchiBase\Service\AbstractService,
     KapitchiEntity\Mapper\EntityMapperInterface,
-    KapitchiEntity\Mapper\EntityDbAdapterMapperOptions as EntityOptions,
     KapitchiEntity\Model\EntityModelInterface;
 
 /**
@@ -79,7 +78,8 @@ class EntityService extends AbstractService
         return $paginator;
     }
     
-    public function findOneBy(array $criteria) {
+    public function findOneBy(array $criteria)
+    {
         $paginator = $this->getPaginator($criteria);
         $paginator->setCurrentPageNumber(1);
         $paginator->setItemCountPerPage(2);
@@ -122,7 +122,15 @@ class EntityService extends AbstractService
         }
     }
     
-    public function loadModel($entity, $options = array(), EntityModelInterface $model = null) {
+    /**
+     * 
+     * @param type $entity
+     * @param type $options
+     * @param \KapitchiEntity\Model\EntityModelInterface $model - used when extending classes creates different Model instances
+     * @return \KapitchiEntity\Model\GenericEntityModel
+     */
+    public function loadModel($entity, $options = array(), EntityModelInterface $model = null)
+    {
         if($model === null) {
             $model = new \KapitchiEntity\Model\GenericEntityModel();
             $model->setEntity($entity);
@@ -200,11 +208,13 @@ class EntityService extends AbstractService
     /**
      * @return EntityMapperInterface
      */
-    public function getMapper() {
+    public function getMapper()
+    {
         return $this->mapper;
     }
     
-    public function setMapper(EntityMapperInterface $mapper) {
+    public function setMapper(EntityMapperInterface $mapper)
+    {
         $this->mapper = $mapper;
     }
     
