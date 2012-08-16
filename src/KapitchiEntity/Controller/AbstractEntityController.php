@@ -133,8 +133,9 @@ abstract class AbstractEntityController extends AbstractActionController
         if($this->getRequest()->isPost()) {
             $values = $this->getRequest()->getPost()->toArray();
             $form->setData($values);
+            
             if($form->isValid()) {
-                $data = $form->getInputFilter()->getValues();
+                $data = $form->getData();
                 $service->getHydrator()->hydrate($data, $entity);
                 $service->persist($entity, $data);
                 
