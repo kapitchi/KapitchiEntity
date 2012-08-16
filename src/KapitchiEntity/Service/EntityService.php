@@ -199,7 +199,7 @@ class EntityService extends AbstractService
         return $entity;
     }
     
-    public function creatArrayFromEntity($entity)
+    public function createArrayFromEntity($entity)
     {
         $entity = $this->getHydrator()->extract($entity);
         return $entity;
