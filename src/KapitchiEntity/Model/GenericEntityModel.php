@@ -9,6 +9,11 @@ class GenericEntityModel implements EntityModelInterface
 {
     protected $entity;
     protected $exts = array();
+    
+    public function __construct($entity = null)
+    {
+        $this->setEntity($entity);
+    }
             
     public function getEntity()
     {
