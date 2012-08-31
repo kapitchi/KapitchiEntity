@@ -77,6 +77,10 @@ class EntityRestfulController extends AbstractRestfulController {
         $hydrator = $service->getHydrator();
         
         $entity = $service->find($id);
+        if(!$entity) {
+            //TODO
+            throw new \Exception("TODO can not find entity #$id");
+        }
         
         $ret = array(
             'id' => $id,
@@ -134,6 +138,27 @@ class EntityRestfulController extends AbstractRestfulController {
             'jsonViewModel' => $jsonModel
         ));
         return $jsonModel;
+    }
+    
+    protected function getEntityId($throwException = true)
+    {
+        $routeMatch = $this->getEvent()->getRouteMatch();
+        $request = $this->getRequest();
+        
+        //copied from AbstractRestfulController - delete method
+        if (null === $id = $routeMatch->getParam('id')) {
+            if (!($id = $request->getQuery()->get('id', false)) && $throwException) {
+                throw new \Exception('Missing identifier');
+            }
+        }
+        
+        return $id;
+    }
+    
+    public function getPut() {
+        $content = $this->getRequest()->getContent();
+        parse_str($content, $values);
+        return new \Zend\Stdlib\Parameters($values);
     }
     
     public function getEntityService() {
