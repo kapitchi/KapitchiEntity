@@ -73,8 +73,20 @@ class EntityService extends AbstractService
      */
     public function getPaginator(array $criteria = null, array $orderBy = null)
     {
-        $adapter = $this->getMapper()->getPaginatorAdapter($criteria, $orderBy);
+        $criteria = new \ArrayObject((array)$criteria);
+        $orderBy = new \ArrayObject((array)$orderBy);
+        $this->triggerEvent('getPaginator.pre', array(
+            'criteria' => $criteria,
+            'orderBy' => $orderBy
+        ));
+        
+        $adapter = $this->getMapper()->getPaginatorAdapter($criteria->getArrayCopy(), $orderBy->getArrayCopy());
         $paginator = new Paginator($adapter);
+        
+        $this->triggerEvent('getPaginator.post', array(
+            'paginator' => $paginator
+        ));
+        
         return $paginator;
     }
     

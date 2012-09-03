@@ -33,11 +33,15 @@ abstract class AbstractEntityController extends AbstractActionController
     {
         $pageNumber = $this->getCurrentPageNumber();
         
+        $criteria = new \ArrayObject(array());
+        $orderBy = new \ArrayObject(array());
         $this->getEventManager()->trigger('index.pre', $this, array(
             'pageNumber' => $pageNumber,
+            'paginatorCriteria' => $criteria,
+            'paginatorOrderBy' => $orderBy,
         ));
         
-        $paginator = $this->getEntityService()->getPaginator();
+        $paginator = $this->getEntityService()->getPaginator($criteria->getArrayCopy(), $orderBy->getArrayCopy());
         $paginator->setCurrentPageNumber($pageNumber);
         
         $viewModel = $this->getEntityViewModel();
