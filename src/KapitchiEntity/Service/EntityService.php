@@ -84,17 +84,18 @@ class EntityService extends AbstractService
     {
         $criteria = new \ArrayObject((array)$criteria);
         $orderBy = new \ArrayObject((array)$orderBy);
-        $this->triggerEvent('getPaginator.pre', array(
+        
+        $ret = $this->triggerEvent('getPaginator', array(
             'criteria' => $criteria,
             'orderBy' => $orderBy
-        ));
+        ), function($ret) {
+            return $ret instanceof Paginator;
+        });
         
-        $adapter = $this->getMapper()->getPaginatorAdapter($criteria->getArrayCopy(), $orderBy->getArrayCopy());
-        $paginator = new Paginator($adapter);
-        
-        $this->triggerEvent('getPaginator.post', array(
-            'paginator' => $paginator
-        ));
+        $paginator = $ret->last();
+        if(!$paginator instanceof Paginator) {
+            throw new \Exception("TODO No paginator returned");
+        }
         
         return $paginator;
     }
@@ -174,15 +175,18 @@ class EntityService extends AbstractService
         $events = $this->getEventManager();
         $mapper = $this->getMapper();
         
-        $events->attach('findOneBy', function($e) use ($mapper) {
-            $criteria = $e->getParam('criteria');
-            return $mapper->findOneBy($criteria);
-        });
-        
         $events->attach('find', function($e) use ($mapper) {
             $priKey = $e->getParam('priKey');
             return $mapper->find($priKey);
         });
+        
+        $events->attach('getPaginator', function($e) use ($mapper) {
+            $criteria = $e->getParam('criteria');
+            $orderBy = $e->getParam('orderBy');
+            $adapter = $mapper->getPaginatorAdapter($criteria->getArrayCopy(), $orderBy->getArrayCopy());
+            return new Paginator($adapter);
+        });
+        
         
         $events->attach('persist', function($e) use ($instance) {
             return $instance->getMapper()->persist($e->getParam('entity'));
