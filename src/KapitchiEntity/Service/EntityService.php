@@ -41,10 +41,19 @@ class EntityService extends AbstractService
                 $mapper->beginTransaction();
             }
             
-            $this->triggerEvent('persist', array(
+            $params = array(
                 'data' => $data,
                 'entity' => $entity,
-            ));
+            );
+            
+            //TODO excepts entity to have "id" we need EntityInterface - getId/setId!
+            $entityId = $entity->getId();
+            if($entityId) {
+                $params['origEntity'] = $this->getMapper()->find($entityId);
+            }
+            //END
+            
+            $this->triggerEvent('persist', $params);
             
             if($mapper instanceof Transactional) {
                 $mapper->commit();
