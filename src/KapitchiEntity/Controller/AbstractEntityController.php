@@ -92,11 +92,12 @@ abstract class AbstractEntityController extends AbstractActionController
             if($form->isValid()) {
                 $values = $form->getInputFilter()->getValues();
                 $entity = $service->createEntityFromArray($values);
-                $service->persist($entity, $values);
+                $persistEvent = $service->persist($entity, $values);
                 
                 $ret = $this->getEventManager()->trigger('create.persist.post', $this, array(
                     'form' => $form,
                     'entity' => $entity,
+                    'persistEvent' => $persistEvent,
                 ), function($ret) {
                     return ($ret instanceof Response);
                 });
@@ -133,6 +134,10 @@ abstract class AbstractEntityController extends AbstractActionController
         
         $form = $this->getEntityForm();
         $form->setAttribute('action', $this->getUpdateUrl($entity));
+        $eventParams = array(
+            'form' => $form,
+            'entity' => $entity,
+        );
         
         if($this->getRequest()->isPost()) {
             $values = $this->getRequest()->getPost()->toArray();
@@ -141,12 +146,8 @@ abstract class AbstractEntityController extends AbstractActionController
             if($form->isValid()) {
                 $data = $form->getData();
                 $service->getHydrator()->hydrate($data, $entity);
-                $service->persist($entity, $data);
-                
-                $ret = $this->getEventManager()->trigger('update.persist.post', $this, array(
-                    'form' => $form,
-                    'entity' => $entity,
-                ), function($ret) {
+                $eventParams['persistEvent'] = $service->persist($entity, $data);
+                $ret = $this->getEventManager()->trigger('update.persist.post', $this, $eventParams, function($ret) {
                     return ($ret instanceof Response);
                 });
                 $last = $ret->last();
@@ -156,7 +157,7 @@ abstract class AbstractEntityController extends AbstractActionController
             }
         }
         
-        $form->setData($service->getHydrator()->extract($entity));
+        $eventParams['formData'] = new \ArrayObject($service->getHydrator()->extract($entity));
         
         $model = $this->getEntityService()->loadModel($entity);
         
@@ -166,12 +167,12 @@ abstract class AbstractEntityController extends AbstractActionController
             'form' => $form,
         ));
         
-        $this->getEventManager()->trigger('update.post', $this, array(
-            'viewModel' => $viewModel,
-            'model' => $model,
-            'form' => $form,
-        ));
-        
+        $eventParams['model'] = $model;
+        $eventParams['viewModel'] = $viewModel;
+        $this->getEventManager()->trigger('update.post', $this, $eventParams);
+
+        $form->setData($eventParams['formData']);
+
         return $viewModel;
     }
     

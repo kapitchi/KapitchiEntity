@@ -31,7 +31,7 @@ class RevisionService extends EntityService
         
         //increase rev number
         $revisionNumber = 0;
-        $latest = $this->getLatestByEntityId($entityId);
+        $latest = $this->findLatestByEntityId($entityId);
         if($latest) {
             $revisionNumber = $latest->getRevision();
         }
@@ -87,7 +87,7 @@ class RevisionService extends EntityService
         return $entity;
     }
     
-    public function getLatestByEntityId($entityId) {
+    public function findLatestByEntityId($entityId) {
         $paginator = $this->getPaginator(array(
                 'revisionEntityId' => $entityId,
             ),

@@ -25,10 +25,6 @@ class EntityService extends AbstractService
         $this->setHydrator($hydrator);
     }
     
-    /**
-     * @param array $data
-     * @return object
-     */
     public function persist($entity, $data = null)
     {
         if(!is_object($entity)) {
@@ -53,7 +49,8 @@ class EntityService extends AbstractService
             }
             //END
             
-            $this->triggerEvent('persist', $params);
+            $event = $this->createPersistEvent($params);
+            $this->getEventManager()->trigger($event);
             
             if($mapper instanceof Transactional) {
                 $mapper->commit();
@@ -66,7 +63,17 @@ class EntityService extends AbstractService
             throw $e;
         }
         
-        return $entity;
+        return $event;
+    }
+    
+    public function createPersistEvent(array $params)
+    {
+        return new Event\PersistEvent('persist', $this, $params);
+    }
+    
+    public function createRemoveEvent(array $params)
+    {
+        return new Event\RemoveEvent('remove', $this, $params);
     }
     
     public function find($priKey)
@@ -154,8 +161,7 @@ class EntityService extends AbstractService
     public function loadModel($entity, $options = array(), EntityModelInterface $model = null)
     {
         if($model === null) {
-            $model = new \KapitchiEntity\Model\GenericEntityModel();
-            $model->setEntity($entity);
+            $model = new \KapitchiEntity\Model\GenericEntityModel($entity);
         }
         
         $this->triggerEvent('loadModel', array(
