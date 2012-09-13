@@ -8,6 +8,7 @@ use Zend\Mvc\Controller\AbstractRestfulController,
     KapitchiEntity\Service\EntityService;
 
 class EntityRestfulController extends AbstractRestfulController {
+    protected $eventIdentifier = __CLASS__;
     protected $entityService;
     
     public function __construct($entityService = null)
@@ -168,5 +169,14 @@ class EntityRestfulController extends AbstractRestfulController {
     public function setEntityService(EntityService $entityService) {
         $this->entityService = $entityService;
     }
+    
+    protected function attachDefaultListeners()
+    {
+        parent::attachDefaultListeners();
+        
+        $events = $this->getEventManager();
+        $instance = $this;
+        
+    } 
 
 }

@@ -3,6 +3,7 @@ namespace KapitchiEntity\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController,
     Zend\Http\Response,
+    Zend\Paginator\Paginator,
     KapitchiEntity\View\Model\EntityViewModel,
     KapitchiEntity\Service\EntityService;
 
@@ -15,7 +16,6 @@ abstract class AbstractEntityController extends AbstractActionController
     protected $entityService;
     protected $entityForm;
     protected $entityViewModel;
-    protected $entityHelper;
     
     abstract public function getUpdateUrl($entity);
     abstract public function getIndexUrl();
@@ -31,17 +31,23 @@ abstract class AbstractEntityController extends AbstractActionController
     
     public function indexAction()
     {
+        $ret = $this->getEventManager()->trigger('index.pre', $this);
+        
         $pageNumber = $this->getCurrentPageNumber();
         
         $criteria = new \ArrayObject(array());
         $orderBy = new \ArrayObject(array());
-        $this->getEventManager()->trigger('index.pre', $this, array(
+        $ret = $this->getEventManager()->trigger('index.paginator', $this, array(
             'pageNumber' => $pageNumber,
             'paginatorCriteria' => $criteria,
             'paginatorOrderBy' => $orderBy,
-        ));
-        
-        $paginator = $this->getEntityService()->getPaginator($criteria->getArrayCopy(), $orderBy->getArrayCopy());
+        ), function($ret) {
+            return $ret instanceof Paginator;
+        });
+        $paginator = $ret->last();
+        if(!$paginator instanceof Paginator) {
+            throw new \Exception("TODO index action expects paginator object");
+        }
         $paginator->setCurrentPageNumber($pageNumber);
         
         $viewModel = $this->getEntityViewModel();
@@ -212,6 +218,13 @@ abstract class AbstractEntityController extends AbstractActionController
             $entity = $e->getParam('entity');
             return $instance->redirect()->toUrl($instance->getUpdateUrl($entity));
         });
+        
+        $events->attach('index.paginator', function($e) {
+            $criteria = $e->getParam('paginatorCriteria');
+            $orderBy = $e->getParam('paginatorOrderBy');
+            return $e->getTarget()->getEntityService()->getPaginator($criteria->getArrayCopy(), $orderBy->getArrayCopy());
+        
+        });
     }
     
     /**
@@ -255,14 +268,4 @@ abstract class AbstractEntityController extends AbstractActionController
         $this->entityViewModel = $entityViewModel;
     }
     
-    public function getEntityHelper()
-    {
-        return $this->entityHelper;
-    }
-
-    public function setEntityHelper($entityHelper)
-    {
-        $this->entityHelper = $entityHelper;
-    }
-
 }
