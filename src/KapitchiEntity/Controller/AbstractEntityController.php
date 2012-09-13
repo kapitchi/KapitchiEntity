@@ -90,8 +90,11 @@ abstract class AbstractEntityController extends AbstractActionController
     public function createAction()
     {
         $form = $this->getEntityForm();
-        $service = $this->getEntityService();
+        $this->getEventManager()->trigger('create.pre', $this, array(
+            'form' => $form,
+        ));
         
+        $service = $this->getEntityService();
         if($this->getRequest()->isPost()) {
             $data = $this->getRequest()->getPost()->toArray();
             $form->setData($data);
