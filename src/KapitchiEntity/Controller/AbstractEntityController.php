@@ -69,7 +69,7 @@ abstract class AbstractEntityController extends AbstractActionController
         $entity = $this->getEntityService()->find($id);
         if(!$entity) {
             //TODO
-            throw new \Exception("No entity found [id: '$id']");
+            throw new \KapitchiEntity\Exception\EntityNotFoundException("No entity found [id: '$id']");
         }
         
         $model = $this->getEntityService()->loadModel($entity);
@@ -138,7 +138,7 @@ abstract class AbstractEntityController extends AbstractActionController
         $entity = $service->find($id);
         if(!$entity) {
             //TODO
-            throw new \Exception("No entity found [id: '$id']");
+            throw new \KapitchiEntity\Exception\EntityNotFoundException("No entity found [id: '$id']");
         }
         
         $form = $this->getEntityForm();
@@ -191,6 +191,10 @@ abstract class AbstractEntityController extends AbstractActionController
         
         $service = $this->getEntityService();
         $entity = $service->find($id);
+        if(!$entity) {
+            throw new \KapitchiEntity\Exception\EntityNotFoundException("No entity found [id: '$id']");
+        }
+        
         //TODO remove by ID? or whole entity object?
         $service->remove($id);
         

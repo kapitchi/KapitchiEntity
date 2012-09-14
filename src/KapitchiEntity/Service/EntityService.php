@@ -28,7 +28,7 @@ class EntityService extends AbstractService
     public function persist($entity, $data = null)
     {
         if(!is_object($entity)) {
-            throw new \Exception('Not an entity object');
+            throw new \KapitchiEntity\Exception\NotEntityException("Not an entity");
         }
         
         $mapper = $this->getMapper();
@@ -126,7 +126,7 @@ class EntityService extends AbstractService
         if(!is_object($entity)) {
             $entity = $mapper->find($entity);
             if(!$entity) {
-                throw new \Exception("Entity does not exist #$id");
+                throw new \KapitchiEntity\Exception\EntityNotFoundException("Entity does not exist #$id");
             }
         }
         
@@ -206,7 +206,7 @@ class EntityService extends AbstractService
                 $data = $instance->getHydrator()->extract($entity);
                 $inputFilter->setData($data);
                 if(!$inputFilter->isValid()) {
-                    $e = new Exception\ValidationException("Validation failed on the entity");
+                    $e = new \KapitchiEntity\Exception\ValidationException("Validation failed");
                     $e->setEntity($entity);
                     $e->setInputFilter($inputFilter);
                     throw $e;

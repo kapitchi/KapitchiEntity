@@ -25,11 +25,13 @@ class EntityRestfulController extends AbstractRestfulController {
         );
         try {
             return parent::onDispatch($event);
-        } catch(\KapitchiEntity\Service\Exception\ValidationException $e) {
+        } catch(\KapitchiEntity\Exception\ValidationException $e) {
+            $event->getResponse()->setStatusCode(403);
             $ret['errorMsg'] = $e->getMessage();
             $ret['errorType'] = 'validation';
             $ret['messages'] = $e->getInputFilter()->getMessages();
         } catch(\Exception $e) {
+            $event->getResponse()->setStatusCode(500);
             $ret['errorMsg'] = $e->getMessage();
             $ret['errorType'] = 'exception';
         }

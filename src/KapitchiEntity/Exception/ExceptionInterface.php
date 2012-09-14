@@ -1,5 +1,5 @@
 <?php
-namespace KapitchiEntity\Service\Exception;
+namespace KapitchiEntity\Exception;
 
 /**
  * 
