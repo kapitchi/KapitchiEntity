@@ -6,9 +6,19 @@ class AbstractEntityHelper extends \Zend\View\Helper\AbstractHelper
 {
     protected $entityService;
     
+    public function __construct($entityService)
+    {
+        $this->setEntityService($entityService);
+    }
+    
     public function find($id)
     {
         return $this->getEntityService()->find($id);
+    }
+    
+    public function getPaginator($criteria = null, $orderBy = null)
+    {
+        return $this->getEntityService()->getPaginator($criteria, $orderBy);
     }
     
     /**
