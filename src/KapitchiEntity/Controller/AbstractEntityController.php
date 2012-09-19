@@ -76,12 +76,14 @@ abstract class AbstractEntityController extends AbstractActionController
         
         $viewModel = $this->getEntityViewModel();
         $viewModel->setVariables(array(
-            'model' => $model
+            'entity' => $entity,
+            'model' => $model,//DEPRECATED - we probably delete whole model stuff
         ));
         
         $this->getEventManager()->trigger('view.post', $this, array(
             'viewModel' => $viewModel,
-            'model' => $model,
+            'entity' => $entity,
+            'model' => $model,//DEPRECATED - we probably delete whole model stuff
         ));
         
         return $viewModel;
@@ -143,27 +145,14 @@ abstract class AbstractEntityController extends AbstractActionController
         
         $form = $this->getEntityForm();
         $form->setAttribute('action', $this->getUpdateUrl($entity));
+        
         $eventParams = array(
             'form' => $form,
             'entity' => $entity,
         );
         
         if($this->getRequest()->isPost()) {
-            $values = $this->getRequest()->getPost()->toArray();
-            $form->setData($values);
-            
-            if($form->isValid()) {
-                $data = $form->getData();
-                $service->getHydrator()->hydrate($data, $entity);
-                $eventParams['persistEvent'] = $service->persist($entity, $data);
-                $ret = $this->getEventManager()->trigger('update.persist.post', $this, $eventParams, function($ret) {
-                    return ($ret instanceof Response);
-                });
-                $last = $ret->last();
-                if($last instanceof Response) {
-                    return $last;
-                }
-            }
+            $this->getEventManager()->trigger('update.persist', $this, $eventParams);
         }
         
         $eventParams['formData'] = new \ArrayObject($service->getHydrator()->extract($entity));
@@ -172,7 +161,8 @@ abstract class AbstractEntityController extends AbstractActionController
         
         $viewModel = $this->getEntityViewModel();
         $viewModel->setVariables(array(
-            'model' => $model,
+            'entity' => $entity,
+            'model' => $model,//DEPRECATED - we probably delete whole model stuff
             'form' => $form,
         ));
         
@@ -231,6 +221,21 @@ abstract class AbstractEntityController extends AbstractActionController
             $orderBy = $e->getParam('paginatorOrderBy');
             return $e->getTarget()->getEntityService()->getPaginator($criteria->getArrayCopy(), $orderBy->getArrayCopy());
         
+        });
+        
+        $events->attach('update.persist', function($e) {
+            $cont = $e->getTarget();
+            $form = $e->getParam('form');
+            $service = $cont->getEntityService();
+            
+            $values = $cont->getRequest()->getPost()->toArray();
+            $form->setData($values);
+            if($form->isValid()) {
+                $data = $form->getData();
+                $entity = $e->getParam('entity');
+                $service->getHydrator()->hydrate($data, $entity);
+                $e->setParam('persistEvent', $service->persist($entity, $data));
+            }
         });
     }
     
