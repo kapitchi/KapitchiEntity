@@ -156,7 +156,13 @@ abstract class AbstractEntityController extends AbstractActionController
         $this->getEventManager()->trigger('update.pre', $this, $eventParams);
         
         if($this->getRequest()->isPost()) {
-            $this->getEventManager()->trigger('update.persist', $this, $eventParams);
+            $ret = $this->getEventManager()->trigger('update.persist', $this, $eventParams, function($ret) {
+                return ($ret instanceof Response);
+            });
+            $last = $ret->last();
+            if($last instanceof Response) {
+                return $last;
+            }
         }
         
         $eventParams['formData'] = new \ArrayObject($service->getHydrator()->extract($entity));
