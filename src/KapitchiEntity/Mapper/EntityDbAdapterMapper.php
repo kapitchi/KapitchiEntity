@@ -164,7 +164,12 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
     {
         $select = $this->select();
         $select->from($this->getTableName());
+        $this->initPaginatorSelect($select, $criteria, $orderBy);
+        return $this->createPaginatorAdapter($select);
+    }
     
+    protected function initPaginatorSelect(Select $select, array $criteria = null, array $orderBy = null)
+    {
         if(is_array($criteria)) {
             $mappedCriteria = array();
             foreach ($criteria as $property => $value) {
@@ -178,7 +183,11 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
             $select->order($orderBy);
         }
         
-        //Until DbAdapter adapter works we use array
+    }
+    
+    protected function createPaginatorAdapter(Select $select)
+    {
+        //TODO Until DbAdapter adapter works we use array
         $ret = $this->selectWith($select);
         $arr = array();
         foreach ($ret as $item) {

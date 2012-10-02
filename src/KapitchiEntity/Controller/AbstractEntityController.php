@@ -146,10 +146,14 @@ abstract class AbstractEntityController extends AbstractActionController
         $form = $this->getEntityForm();
         $form->setAttribute('action', $this->getUpdateUrl($entity));
         
+        $viewModel = $this->getEntityViewModel();
         $eventParams = array(
+            'viewModel' => $viewModel,
             'form' => $form,
             'entity' => $entity,
         );
+        
+        $this->getEventManager()->trigger('update.pre', $this, $eventParams);
         
         if($this->getRequest()->isPost()) {
             $this->getEventManager()->trigger('update.persist', $this, $eventParams);
@@ -159,7 +163,6 @@ abstract class AbstractEntityController extends AbstractActionController
         
         $model = $this->getEntityService()->loadModel($entity);
         
-        $viewModel = $this->getEntityViewModel();
         $viewModel->setVariables(array(
             'entity' => $entity,
             'model' => $model,//DEPRECATED - we probably delete whole model stuff

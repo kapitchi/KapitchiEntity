@@ -164,6 +164,10 @@ class EntityRestfulController extends AbstractRestfulController {
         return new \Zend\Stdlib\Parameters($values);
     }
     
+    /**
+     * 
+     * @return \KapitchiEntity\Service\EntityService
+     */
     public function getEntityService() {
         return $this->entityService;
     }
