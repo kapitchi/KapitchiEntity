@@ -3,6 +3,7 @@ namespace KapitchiEntity\Controller;
 
 use Zend\Mvc\Controller\AbstractActionController,
     Zend\Http\Response,
+    Zend\EventManager\EventManagerInterface,
     Zend\Paginator\Paginator,
     KapitchiEntity\View\Model\EntityViewModel,
     KapitchiEntity\Service\EntityService;
@@ -289,4 +290,28 @@ abstract class AbstractEntityController extends AbstractActionController
         $this->entityViewModel = $entityViewModel;
     }
     
+    /**
+     * Adds all subclass identifiers
+     * 
+     * @author Matus Zeman <mz@kapitchi.com>
+     * @param  EventManagerInterface $events
+     * @return AbstractController
+     */
+    public function setEventManager(EventManagerInterface $events)
+    {
+        
+        $events->setIdentifiers(array(
+            'Zend\Stdlib\DispatchableInterface',
+            'Zend\Mvc\Controller\AbstractController',
+            'Zend\Mvc\Controller\AbstractActionController',
+            __CLASS__,
+            get_called_class(),
+            $this->eventIdentifier,
+            substr(get_called_class(), 0, strpos(get_called_class(), '\\'))
+        ));
+        $this->events = $events;
+        $this->attachDefaultListeners();
+
+        return $this;
+    }
 }
