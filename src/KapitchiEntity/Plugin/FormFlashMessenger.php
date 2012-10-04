@@ -5,7 +5,8 @@ use Zend\EventManager\EventInterface,
     KapitchiApp\PluginManager\PluginInterface;
 
 /**
- *
+ * @todo This needs to be rewritten to use ControllerPluginManager directly
+ * and do not rely on controller?
  * @author Matus Zeman <mz@kapitchi.com>
  */
 class FormFlashMessenger implements PluginInterface
@@ -41,6 +42,7 @@ class FormFlashMessenger implements PluginInterface
         
         $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'update.post', array($this, 'createMessages'));
         $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'create.post', array($this, 'createMessages'));
+        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'create.persist.post', array($this, 'createPersistMessage'), 1000);
     }
     
     public function createMessages($e) {
@@ -57,6 +59,14 @@ class FormFlashMessenger implements PluginInterface
                 'inputFilterMessages' => $msgs
             ));
         }
+    }
+    
+    public function createPersistMessage($e) {
+        $cont = $e->getTarget();
+        $fm = $cont->plugin('flashMessenger')->setNamespace('FormFlashMessenger');
+        $fm->addMessage(array(
+            'message' => "Form submitted",
+        ));
     }
     
 }
