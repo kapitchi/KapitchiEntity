@@ -40,33 +40,37 @@ class FormFlashMessenger implements PluginInterface
         
         $instance = $this;
         
-        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'update.post', array($this, 'createMessages'));
-        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'create.post', array($this, 'createMessages'));
-        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'create.persist.post', array($this, 'createPersistMessage'), 1000);
+        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'update.persist', array($this, 'createMessages'), -1000);
+        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'create.persist', array($this, 'createMessages'), -1000);
+        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'remove.post', function($e) {
+            $cont = $e->getTarget();
+            $fm = $cont->plugin('flashMessenger')->setNamespace('FormFlashMessenger');
+            $fm->addMessage(array(
+                'message' => "Item deleted",
+            ));
+        });
     }
     
     public function createMessages($e) {
         $form = $e->getParam('form');
-        $viewModel = $e->getParam('viewModel');
         $cont = $e->getTarget();
 
         $inputFilter = $form->getInputFilter();
         $msgs = $inputFilter->getMessages();
+        $fm = $cont->plugin('flashMessenger')->setNamespace('FormFlashMessenger');
         if(!empty($msgs)) {
-            $fm = $cont->plugin('flashMessenger')->setNamespace('FormFlashMessenger');
             $fm->addMessage(array(
                 'message' => "Form validation error",
+                'sticky' => true,
+                'theme' => 'warning',
                 'inputFilterMessages' => $msgs
             ));
         }
-    }
-    
-    public function createPersistMessage($e) {
-        $cont = $e->getTarget();
-        $fm = $cont->plugin('flashMessenger')->setNamespace('FormFlashMessenger');
-        $fm->addMessage(array(
-            'message' => "Form submitted",
-        ));
+        else {
+            $fm->addMessage(array(
+                'message' => "Item saved",
+            ));
+        }
     }
     
 }

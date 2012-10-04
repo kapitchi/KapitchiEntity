@@ -93,42 +93,30 @@ abstract class AbstractEntityController extends AbstractActionController
     public function createAction()
     {
         $form = $this->getEntityForm();
-        $this->getEventManager()->trigger('create.pre', $this, array(
-            'form' => $form,
-        ));
+        $viewModel = $this->getEntityViewModel();
         
-        $service = $this->getEntityService();
+        $eventParams = array(
+            'form' => $form,
+            'viewModel' => $viewModel,
+        );
+        
+        $this->getEventManager()->trigger('create.pre', $this, $eventParams);
+        
         if($this->getRequest()->isPost()) {
-            $data = $this->getRequest()->getPost()->toArray();
-            $form->setData($data);
-            if($form->isValid()) {
-                $values = $form->getInputFilter()->getValues();
-                $entity = $service->createEntityFromArray($values);
-                $persistEvent = $service->persist($entity, $values);
-                
-                $ret = $this->getEventManager()->trigger('create.persist.post', $this, array(
-                    'form' => $form,
-                    'entity' => $entity,
-                    'persistEvent' => $persistEvent,
-                ), function($ret) {
-                    return ($ret instanceof Response);
-                });
-                $last = $ret->last();
-                if($last instanceof Response) {
-                    return $last;
-                }
+            $ret = $this->getEventManager()->trigger('create.persist', $this, $eventParams, function($ret) {
+                return ($ret instanceof Response);
+            });
+            $last = $ret->last();
+            if($last instanceof Response) {
+                return $last;
             }
         }
         
-        $viewModel = $this->getEntityViewModel();
         $viewModel->setVariables(array(
             'form' => $form,
         ));
         
-        $this->getEventManager()->trigger('create.post', $this, array(
-            'viewModel' => $viewModel,
-            'form' => $form,
-        ));
+        $this->getEventManager()->trigger('create.post', $this, $eventParams);
         
         return $viewModel;
     }
@@ -230,7 +218,32 @@ abstract class AbstractEntityController extends AbstractActionController
             $criteria = $e->getParam('paginatorCriteria');
             $orderBy = $e->getParam('paginatorOrderBy');
             return $e->getTarget()->getEntityService()->getPaginator($criteria->getArrayCopy(), $orderBy->getArrayCopy());
+        });
         
+        $events->attach('create.persist', function($e) {
+            $cont = $e->getTarget();
+            $form = $e->getParam('form');
+            $service = $cont->getEntityService();
+            
+            $data = $cont->getRequest()->getPost()->toArray();
+            $form->setData($data);
+            if($form->isValid()) {
+                $values = $form->getInputFilter()->getValues();
+                $entity = $service->createEntityFromArray($values);
+                $persistEvent = $service->persist($entity, $values);
+                
+                $ret = $cont->getEventManager()->trigger('create.persist.post', $cont, array(
+                    'form' => $form,
+                    'entity' => $entity,
+                    'persistEvent' => $persistEvent,
+                ), function($ret) {
+                    return ($ret instanceof Response);
+                });
+                $last = $ret->last();
+                if($last instanceof Response) {
+                    return $last;
+                }
+            }
         });
         
         $events->attach('update.persist', function($e) {
