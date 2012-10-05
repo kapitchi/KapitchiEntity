@@ -81,6 +81,16 @@ class EntityService extends AbstractService
         return $this->getMapper()->find($priKey);
     }
     
+    public function get($priKey)
+    {
+        $ret = $this->find($priKey);
+        if($ret) {
+            return $ret;
+        }
+        
+        throw new \KapitchiEntity\Exception\EntityNotFoundException("Entity not found");
+    }
+    
     /**
      * 
      * @param array $criteria
@@ -117,6 +127,16 @@ class EntityService extends AbstractService
         }
         $items = $paginator->getCurrentItems();
         return current($items);
+    }
+    
+    public function getOneBy(array $criteria)
+    {
+        $ret = $this->findOneBy($criteria);
+        if($ret) {
+            return $ret;
+        }
+        
+        throw new \KapitchiEntity\Exception\EntityNotFoundException("Entity not found");
     }
     
     public function remove($entity)
