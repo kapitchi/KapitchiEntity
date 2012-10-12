@@ -3,6 +3,7 @@ namespace KapitchiEntity\Service;
 
 use Zend\Stdlib\Hydrator\HydratorInterface as EntityHydrator,
     Zend\Paginator\Paginator,
+    Zend\EventManager\EventManagerInterface,
     KapitchiBase\Service\AbstractService,
     KapitchiEntity\Mapper\EntityMapperInterface,
     KapitchiEntity\Model\EntityModelInterface;
@@ -76,9 +77,15 @@ class EntityService extends AbstractService
         return new Event\RemoveEvent('remove', $this, $params);
     }
     
-    public function find($priKey)
+    public function find($id)
     {
-        return $this->getMapper()->find($priKey);
+        $ret = $this->triggerEvent('find', array(
+            'id' => $id
+        ), function($r) {
+            return is_object($r);
+        });
+        $entity = $ret->last();
+        return $entity;
     }
     
     public function get($priKey)
@@ -193,6 +200,14 @@ class EntityService extends AbstractService
         return $model;
     }
     
+    public function setEventManager(EventManagerInterface $events)
+    {
+        $events->setIdentifiers(array(__CLASS__, get_called_class()));
+        $this->eventManager = $events;
+        $this->attachDefaultListeners();
+        return $this;
+    }
+    
     protected function attachDefaultListeners()
     {
         parent::attachDefaultListeners();
@@ -202,8 +217,8 @@ class EntityService extends AbstractService
         $mapper = $this->getMapper();
         
         $events->attach('find', function($e) use ($mapper) {
-            $priKey = $e->getParam('priKey');
-            return $mapper->find($priKey);
+            $id = $e->getParam('id');
+            return $mapper->find($id);
         });
         
         $events->attach('getPaginator', function($e) use ($mapper) {
