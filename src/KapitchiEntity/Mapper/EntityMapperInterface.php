@@ -19,5 +19,10 @@ interface EntityMapperInterface
      */
     public function find($id);
 
+    /**
+     * @param array $criteria
+     * @param array $orderBy
+     * @return \Zend\Paginator\Adapter\AdapterInterface
+     */
     public function getPaginatorAdapter(array $criteria, array $orderBy = null);
 }

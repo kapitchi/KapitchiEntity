@@ -85,6 +85,10 @@ class EntityService extends AbstractService
             return is_object($r);
         });
         $entity = $ret->last();
+        $this->triggerEvent('find.post', array(
+            'id' => $id,
+            'entity' => $entity,
+        ));
         return $entity;
     }
     
