@@ -29,7 +29,13 @@ class EntityService extends AbstractService
     public function persist($entity, $data = null)
     {
         if(!is_object($entity)) {
-            throw new \KapitchiEntity\Exception\NotEntityException("Not an entity");
+            if(is_array($entity)) {
+                $data = $entity;
+                $entity = $this->createEntityFromArray($entity);
+            }
+            else {
+                throw new \KapitchiEntity\Exception\NotEntityException("Not an entity");
+            }
         }
         
         $mapper = $this->getMapper();
@@ -180,6 +186,33 @@ class EntityService extends AbstractService
             }
             throw $e;
         }
+    }
+    
+    public function getFieldValues($entity, $field = null)
+    {
+        $values = $this->createArrayFromEntity($entity);
+        if($field !== null && array_key_exists($field, $values)) {
+            return $values[$field];
+        }
+        
+        $values = new \ArrayObject($values);
+        $ret = $this->triggerEvent('getFieldValues', array(
+            'entity' => $entity,
+            'values' => $values,
+            'field' => $field,
+        ));
+        $values = $values->getArrayCopy();
+        foreach($ret as $r) {
+            if(is_array($r)) {
+                $values = array_merge($values, $r);
+            }
+        }
+        
+        if($field !== null) {
+            return array_key_exists($field, $values) ? $values[$field] : null;
+        }
+        
+        return $values;
     }
     
     /**
