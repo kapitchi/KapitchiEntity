@@ -32,7 +32,7 @@ class AbstractEntityHelper extends \Zend\View\Helper\AbstractHelper
             return $this->getEntity();
         }
         
-        return $this->get($entity);
+        return $this->getEntityService()->get($entity);
     }
     
     public function find($id)
