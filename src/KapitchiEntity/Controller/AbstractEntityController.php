@@ -104,10 +104,10 @@ abstract class AbstractEntityController extends AbstractActionController
         
         if($this->getRequest()->isPost()) {
             $ret = $this->getEventManager()->trigger('create.persist', $this, $eventParams, function($ret) {
-                return ($ret instanceof Response);
+                return ($ret instanceof Response || $ret instanceof \Zend\View\Model\ModelInterface);
             });
             $last = $ret->last();
-            if($last instanceof Response) {
+            if($last instanceof Response || $last instanceof \Zend\View\Model\ModelInterface) {
                 return $last;
             }
         }
@@ -237,10 +237,10 @@ abstract class AbstractEntityController extends AbstractActionController
                     'entity' => $entity,
                     'persistEvent' => $persistEvent,
                 ), function($ret) {
-                    return ($ret instanceof Response);
+                    return ($ret instanceof Response || $ret instanceof \Zend\View\Model\ModelInterface);
                 });
                 $last = $ret->last();
-                if($last instanceof Response) {
+                if($last instanceof Response || $last instanceof \Zend\View\Model\ModelInterface) {
                     return $last;
                 }
             }
