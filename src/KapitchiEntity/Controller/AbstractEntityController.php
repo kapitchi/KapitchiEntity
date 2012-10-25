@@ -152,9 +152,10 @@ abstract class AbstractEntityController extends AbstractActionController
             if($last instanceof Response) {
                 return $last;
             }
+        } else {
+            $form->setData($service->getHydrator()->extract($entity));
+            $this->getEventManager()->trigger('update.load', $this, $eventParams);
         }
-        
-        $eventParams['formData'] = new \ArrayObject($service->getHydrator()->extract($entity));
         
         $model = $this->getEntityService()->loadModel($entity);
         
@@ -167,8 +168,6 @@ abstract class AbstractEntityController extends AbstractActionController
         $eventParams['model'] = $model;
         $eventParams['viewModel'] = $viewModel;
         $this->getEventManager()->trigger('update.post', $this, $eventParams);
-
-        $form->setData($eventParams['formData']);
 
         return $viewModel;
     }
