@@ -12,6 +12,7 @@ class Revision implements RevisionInterface
     protected $revision;
     protected $revisionLog;
     protected $revisionCreated;
+    protected $revisionOwnerId;
 
     public function getId()
     {
@@ -61,6 +62,16 @@ class Revision implements RevisionInterface
     public function setRevisionCreated($revisionCreated)
     {
         $this->revisionCreated = $revisionCreated;
+    }
+    
+    public function getRevisionOwnerId()
+    {
+        return $this->revisionOwnerId;
+    }
+
+    public function setRevisionOwnerId($revisionOwnerId)
+    {
+        $this->revisionOwnerId = $revisionOwnerId;
     }
 
 }
