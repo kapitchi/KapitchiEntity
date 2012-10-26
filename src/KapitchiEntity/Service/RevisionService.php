@@ -1,7 +1,8 @@
 <?php
 namespace KapitchiEntity\Service;
 
-use KapitchiEntity\Entity\RevisionInterface,
+use Zend\EventManager\EventManagerInterface,
+    KapitchiEntity\Entity\RevisionInterface,
     KapitchiEntity\Model\EntityModelInterface;
 
 /**
@@ -96,6 +97,14 @@ class RevisionService extends EntityService
         $items = $paginator->getAdapter()->getItems(0, 1);
         $entityRevision = current($items);
         return $entityRevision;
+    }
+    
+    public function setEventManager(EventManagerInterface $events)
+    {
+        $events->setIdentifiers(array('KapitchiEntity\Service\EntityService', __CLASS__, get_called_class()));
+        $this->eventManager = $events;
+        $this->attachDefaultListeners();
+        return $this;
     }
     
     /**
