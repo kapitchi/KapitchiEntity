@@ -32,12 +32,17 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
      * @param Select $select
      * @return HydratingResultSet
      */
-    public function selectWith(Select $select)
+    public function selectWith($select, $parametersOrQueryMode = null)
     {
         $adapter = $this->getReadDbAdapter();
-        $statement = $adapter->createStatement();
-        $select->prepareStatement($adapter, $statement);
-        $result = $statement->execute();
+        
+        if($select instanceof Select) {
+            $statement = $adapter->createStatement();
+            $select->prepareStatement($adapter, $statement);
+            $result = $statement->execute();
+        } else {
+            $result = $adapter->query($select, $parametersOrQueryMode);
+        }
 
         $resultSet = new \Zend\Db\ResultSet\HydratingResultSet();
         $resultSet->setHydrator($this->getHydrator());
@@ -185,10 +190,10 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
         
     }
     
-    protected function createPaginatorAdapter(Select $select)
+    protected function createPaginatorAdapter($select, $parametersOrQueryMode = null)
     {
-        //TODO Until DbAdapter adapter works we use array
-        $ret = $this->selectWith($select);
+        //TODO Until DbAdapter adapter workst we use array
+        $ret = $this->selectWith($select, $parametersOrQueryMode);
         $arr = array();
         foreach ($ret as $item) {
             $arr[] = $item;
