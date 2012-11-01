@@ -134,6 +134,21 @@ class EntityService extends AbstractService
         return $paginator;
     }
     
+    public function fetchAll(array $criteria = null, array $orderBy = null, $callback = null)
+    {
+        $paginator = $this->getPaginator($criteria, $orderBy);
+        $ret = array();
+        foreach($paginator as $item) {
+            if(is_callable($callback)) {
+                $ret[$item->getId()] = $callback($item);
+            }
+            else {
+                $ret[$item->getId()] = $item;
+            }
+        }
+        return $ret;
+    }
+    
     public function findOneBy(array $criteria)
     {
         $paginator = $this->getPaginator($criteria);

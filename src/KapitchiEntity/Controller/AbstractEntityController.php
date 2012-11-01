@@ -73,18 +73,14 @@ abstract class AbstractEntityController extends AbstractActionController
             throw new \KapitchiEntity\Exception\EntityNotFoundException("No entity found [id: '$id']");
         }
         
-        $model = $this->getEntityService()->loadModel($entity);
-        
         $viewModel = $this->getEntityViewModel();
         $viewModel->setVariables(array(
             'entity' => $entity,
-            'model' => $model,//DEPRECATED - we probably delete whole model stuff
         ));
         
-        $this->getEventManager()->trigger('view.post', $this, array(
+        $this->getEventManager()->trigger('view', $this, array(
             'viewModel' => $viewModel,
             'entity' => $entity,
-            'model' => $model,//DEPRECATED - we probably delete whole model stuff
         ));
         
         return $viewModel;
