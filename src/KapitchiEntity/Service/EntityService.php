@@ -123,12 +123,15 @@ class EntityService extends AbstractService
             'criteria' => $criteria,
             'orderBy' => $orderBy
         ), function($ret) {
-            return $ret instanceof Paginator;
+            return $ret instanceof Paginator || is_array($ret);
         });
         
         $paginator = $ret->last();
         if(!$paginator instanceof Paginator) {
-            throw new \Exception("TODO No paginator returned");
+            if(!is_array($paginator)) {
+                throw new \Exception("TODO No paginator returned");
+            }
+            $paginator = new Paginator(new \Zend\Paginator\Adapter\ArrayAdapter($paginator));
         }
         
         return $paginator;
