@@ -137,9 +137,17 @@ class EntityService extends AbstractService
         return $paginator;
     }
     
+    public function getPaginatorAll(array $criteria = null, array $orderBy = null)
+    {
+        $paginator = $this->getPaginator($criteria, $orderBy);
+        $paginator->setItemCountPerPage($paginator->getTotalItemCount());
+        return $paginator;
+    }
+    
     public function fetchAll(array $criteria = null, array $orderBy = null, $callback = null)
     {
         $paginator = $this->getPaginator($criteria, $orderBy);
+        $paginator->setItemCountPerPage($paginator->getTotalItemCount());
         $ret = array();
         foreach($paginator as $item) {
             if(is_callable($callback)) {
