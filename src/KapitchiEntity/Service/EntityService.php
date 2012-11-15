@@ -26,6 +26,20 @@ class EntityService extends AbstractService
         $this->setHydrator($hydrator);
     }
     
+    /**
+     * Checks if argumet is valid entity object this service can work with
+     * @param mixed $entity
+     * @return boolean
+     */
+    public function isEntityInstance($entity)
+    {
+        if(!is_object($entity)) {
+            return false;
+        }
+        
+        return method_exists($entity, 'getId');
+    }
+    
     public function persist($entity, $data = null)
     {
         if(!is_object($entity)) {
@@ -151,7 +165,8 @@ class EntityService extends AbstractService
         $ret = array();
         foreach($paginator as $item) {
             if(is_callable($callback)) {
-                $ret[$item->getId()] = $callback($item);
+                $callret = $callback($item);
+                $ret[$item->getId()] = $callret;
             }
             else {
                 $ret[$item->getId()] = $item;
