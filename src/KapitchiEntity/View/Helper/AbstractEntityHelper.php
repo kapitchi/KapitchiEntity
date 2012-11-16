@@ -35,6 +35,17 @@ class AbstractEntityHelper extends \Zend\View\Helper\AbstractHelper
         return $this->getEntityService()->get($entity);
     }
     
+    public function getFieldValue($field)
+    {
+        return $this->getEntityService()->getFieldValues($this->getEntity(), $field);
+    }
+    
+    public function renderFieldValue($field)
+    {
+        $value = $this->getFieldValue($field);
+        return empty($value) ? $this->getView()->translate('N/A') : $value;
+    }
+    
     public function find($id)
     {
         return $this->getEntityService()->find($id);
