@@ -54,12 +54,6 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
 
     public function persist($object)
     {
-//        $className = $this->getOptions()->getClassName();
-//        if (!$object instanceof $className) {
-//            throw new Exception\InvalidArgumentException(
-//                '$entity must be an instance of ' . $className
-//            );
-//        }
         if ($this->getIdentifier($object)) {
             $this->update($object);
         } else {
@@ -101,12 +95,6 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
      */
     public function remove($object)
     {
-//        $className = $this->getOptions()->getClassName();
-//        if (!$object instanceof $className) {
-//            throw new Exception\InvalidArgumentException(
-//                '$entity must be an instance of ' . $className
-//            );
-//        }
         $value = $this->getIdentifier($object);
         if ($value) {
             $sql = new Sql($this->getReadDbAdapter(), $this->getTableName());
@@ -142,17 +130,21 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
 
     protected function update($entity)
     {
-        $pk = $this->getPrimaryKey();
         $hydrator = $this->getHydrator();
-        $set = $hydrator->extract($entity);
-        
+        $data = $hydrator->extract($entity);
+        return $this->updateArray($data);
+    }
+    
+    protected function updateArray(array $data)
+    {
+        $pk = $this->getPrimaryKey();
         $pkField = $this->getFieldForProperty($pk);
-        $pkValue = $set[$pkField];
-        unset($set[$pkField]);
-
+        $pkValue = $data[$pkField];
+        unset($data[$pkField]);
+        
         $sql = new Sql($this->getWriteDbAdapter(), $this->getTableName());
         $update = $sql->update();
-        $update->set($set);
+        $update->set($data);
         $update->where(array($pkField => $pkValue));
 
         $statement = $sql->prepareStatementForSqlObject($update);
