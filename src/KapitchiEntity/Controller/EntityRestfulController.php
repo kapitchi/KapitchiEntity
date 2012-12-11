@@ -34,6 +34,7 @@ class EntityRestfulController extends AbstractRestfulController {
             $event->getResponse()->setStatusCode(500);
             $ret['errorMsg'] = $e->getMessage();
             $ret['errorType'] = 'exception';
+            //$ret['trace'] = $e->getTraceAsString();
         }
         
         $jsonModel = new JsonModel($ret);

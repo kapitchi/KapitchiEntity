@@ -67,19 +67,24 @@ abstract class AbstractEntityController extends AbstractActionController
     {
         $id = $this->getCurrentEntityId();
         
-        $entity = $this->getEntityService()->find($id);
-        if(!$entity) {
-            //TODO
-            throw new \KapitchiEntity\Exception\EntityNotFoundException("No entity found [id: '$id']");
-        }
+        $service = $this->getEntityService();
+        $entity = $service->get($id);
         
         $viewModel = $this->getEntityViewModel();
+        
+        $form = $this->getEntityForm();
+        $form->setAttribute('readonly', true);
+        $form->setAttribute('action', '#');
+        $form->setData($service->getHydrator()->extract($entity));
+        
         $viewModel->setVariables(array(
             'entity' => $entity,
+            'form' => $form,
         ));
         
-        $this->getEventManager()->trigger('view', $this, array(
+        $this->getEventManager()->trigger('view.post', $this, array(
             'viewModel' => $viewModel,
+            'form' => $form,
             'entity' => $entity,
         ));
         
