@@ -256,8 +256,17 @@ class EntityService extends AbstractService
         return $values;
     }
     
+    public function computeDiff($entity1, $entity2)
+    {
+        $entity1Data = $this->createArrayFromEntity($entity1);
+        $entity2Data = $this->createArrayFromEntity($entity2);
+        
+        $diff = array_diff_assoc($entity1Data, $entity2Data);
+        return $diff;
+    }
+    
     /**
-     * 
+     * @deprecated since version 0.2
      * @param type $entity
      * @param type $options
      * @param \KapitchiEntity\Model\EntityModelInterface $model - used when extending classes creates different Model instances

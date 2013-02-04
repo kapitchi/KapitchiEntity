@@ -22,19 +22,6 @@ class AbstractEntityHelper extends \Zend\View\Helper\AbstractHelper
         return $this;
     }
     
-    protected function fetchEntity($entity = null)
-    {
-        if(is_object($entity)) {
-            return $entity;
-        }
-        
-        if(empty($entity)) {
-            return $this->getEntity();
-        }
-        
-        return $this->getEntityService()->get($entity);
-    }
-    
     public function getFieldValue($field)
     {
         return $this->getEntityService()->getFieldValues($this->getEntity(), $field);
@@ -51,6 +38,16 @@ class AbstractEntityHelper extends \Zend\View\Helper\AbstractHelper
         return $this->getEntityService()->find($id);
     }
     
+    public function toArray($entity, array $data = null)
+    {
+        $ret = $this->getEntityService()->createArrayFromEntity($entity);
+        if($data !== null) {
+            $ret = array_merge($ret, $data);
+        }
+        
+        return $ret;
+    }
+    
     public function getPaginator($criteria = null, $orderBy = null)
     {
         return $this->getEntityService()->getPaginator($criteria, $orderBy);
@@ -65,7 +62,20 @@ class AbstractEntityHelper extends \Zend\View\Helper\AbstractHelper
     {
         $this->entity = $entity;
     }
+    
+    protected function fetchEntity($entity = null)
+    {
+        if(is_object($entity)) {
+            return $entity;
+        }
         
+        if(empty($entity)) {
+            return $this->getEntity();
+        }
+        
+        return $this->getEntityService()->get($entity);
+    }
+    
     /**
      * 
      * @return \KapitchiEntity\Service\EntityService

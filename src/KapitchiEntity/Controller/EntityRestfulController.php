@@ -118,7 +118,8 @@ class EntityRestfulController extends AbstractRestfulController {
         
         $jsonModel = new JsonModel($ret);
         $this->getEventManager()->trigger('getList.post', $this, array(
-            'jsonViewModel' => $jsonModel
+            'paginator' => $paginator,
+            'jsonViewModel' => $jsonModel,
         ));
         return $jsonModel;
     }
@@ -130,7 +131,7 @@ class EntityRestfulController extends AbstractRestfulController {
         $entity = $service->find($id);
         $hydrator->hydrate($data, $entity);
         
-        $service->persist($entity, $data);
+        $persistEvent = $service->persist($entity, $data);
         
         $ret = array(
             'id' => $id,
@@ -140,7 +141,8 @@ class EntityRestfulController extends AbstractRestfulController {
         
         $jsonModel = new JsonModel($ret);
         $this->getEventManager()->trigger('update.post', $this, array(
-            'jsonViewModel' => $jsonModel
+            'jsonViewModel' => $jsonModel,
+            'persistEvent' => $persistEvent,
         ));
         return $jsonModel;
     }
