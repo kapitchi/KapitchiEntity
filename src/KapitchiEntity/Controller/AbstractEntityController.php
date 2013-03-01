@@ -75,7 +75,7 @@ abstract class AbstractEntityController extends AbstractActionController
         $form = $this->getEntityForm();
         $form->setAttribute('readonly', true);
         $form->setAttribute('action', '#');
-        $form->setData($service->getHydrator()->extract($entity));
+        $form->setData($service->createArrayFromEntity($entity));
         
         $viewModel->setVariables(array(
             'entity' => $entity,
@@ -154,7 +154,7 @@ abstract class AbstractEntityController extends AbstractActionController
                 return $last;
             }
         } else {
-            $form->setData($service->getHydrator()->extract($entity));
+            $form->setData($service->createArrayFromEntity($entity));
             $this->getEventManager()->trigger('update.load', $this, $eventParams);
         }
         
