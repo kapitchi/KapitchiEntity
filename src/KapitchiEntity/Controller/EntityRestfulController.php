@@ -20,24 +20,30 @@ class EntityRestfulController extends AbstractRestfulController {
     
     public function onDispatch(MvcEvent $event)
     {
-        $ret = array(
+        $data = array(
             'error' => true,
         );
         try {
-            return parent::onDispatch($event);
+            /**
+             * @todo we should move ErrorHandler stuff into KapDev maybe
+             * as any PHP errors seems to be discovered during dev only?
+             */
+            \Zend\Stdlib\ErrorHandler::start(E_ALL | E_STRICT);
+            $ret = parent::onDispatch($event);
+            \Zend\Stdlib\ErrorHandler::stop(true);
+            return $ret;
         } catch(\KapitchiEntity\Exception\ValidationException $e) {
             $event->getResponse()->setStatusCode(403);
-            $ret['errorMsg'] = $e->getMessage();
-            $ret['errorType'] = 'validation';
-            $ret['messages'] = $e->getInputFilter()->getMessages();
+            $data['errorMsg'] = $e->getMessage();
+            $data['errorType'] = 'validation';
+            $data['messages'] = $e->getInputFilter()->getMessages();
         } catch(\Exception $e) {
             $event->getResponse()->setStatusCode(500);
-            $ret['errorMsg'] = $e->getMessage();
-            $ret['errorType'] = 'exception';
-            //$ret['trace'] = $e->getTraceAsString();
+            $data['errorMsg'] = $e->getMessage();
+            $data['errorType'] = 'exception';
         }
         
-        $jsonModel = new JsonModel($ret);
+        $jsonModel = new JsonModel($data);
         $this->getEventManager()->trigger('error', $this, array(
             'jsonViewModel' => $jsonModel,
             'exception' => $e
