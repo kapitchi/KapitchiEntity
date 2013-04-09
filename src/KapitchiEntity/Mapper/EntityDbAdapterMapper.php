@@ -13,6 +13,7 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
      * @var EntityDbAdapterMapperOptions
      */
     protected $options;
+    protected $resultSetPrototype;
 
     public function __construct($dbAdapter, EntityDbAdapterMapperOptions $options) {
         parent::__construct($dbAdapter);
@@ -44,12 +45,26 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
             $result = $adapter->query($select, $parametersOrQueryMode);
         }
 
-        $resultSet = new \Zend\Db\ResultSet\HydratingResultSet();
-        $resultSet->setHydrator($this->getHydrator());
-        $resultSet->setObjectPrototype($this->getEntityPrototype());
+        $resultSet = clone $this->getResultSetPrototype();
         $resultSet->initialize($result);
 
         return $resultSet;
+    }
+    
+    /**
+     * @return \Zend\Db\ResultSet\ResultSetInterface
+     */
+    protected function getResultSetPrototype()
+    {
+        if($this->resultSetPrototype === null) {
+            $resultSet = new \Zend\Db\ResultSet\HydratingResultSet();
+            $resultSet->setHydrator($this->getHydrator());
+            $resultSet->setObjectPrototype($this->getEntityPrototype());
+            
+            $this->resultSetPrototype = $resultSet;
+        }
+        
+        return $this->resultSetPrototype;
     }
 
     public function persist($object)
@@ -182,18 +197,9 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
         
     }
     
-    protected function createPaginatorAdapter($select, $parametersOrQueryMode = null)
+    protected function createPaginatorAdapter(Select $select, $parametersOrQueryMode = null)
     {
-        //TODO Until DbAdapter adapter workst we use array
-        $ret = $this->selectWith($select, $parametersOrQueryMode);
-        $arr = array();
-        foreach ($ret as $item) {
-            $arr[] = $item;
-        }
-        return new \Zend\Paginator\Adapter\ArrayAdapter($arr);
-        //END
-        
-        //return new \Zend\Paginator\Adapter\DbSelect($select);
+        return new \Zend\Paginator\Adapter\DbSelect($select, $this->getReadDbAdapter(), clone $this->getResultSetPrototype());
     }
     
     protected function getFieldForProperty($prop) {
