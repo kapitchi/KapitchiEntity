@@ -1,5 +1,6 @@
 {
     "name": "kapitchi/entity",
+    "license": "LGPL-3.0",
     "description": "Generic entity API and entity revision control.",
     "keywords": [
         "kapitchi",
