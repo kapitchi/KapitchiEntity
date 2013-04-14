@@ -8,25 +8,78 @@
 
 namespace KapitchiEntity\Controller;
 
-use Zend\Mvc\Controller\AbstractActionController,
-    Zend\Http\Response,
-    Zend\EventManager\EventManagerInterface,
-    Zend\Paginator\Paginator,
-    KapitchiEntity\View\Model\EntityViewModel,
-    KapitchiEntity\Service\EntityService;
+use Zend\Mvc\Controller\AbstractActionController;
+use Zend\Http\Response;
+use Zend\EventManager\EventManagerInterface;
+use Zend\Paginator\Paginator;
+use KapitchiEntity\View\Model\EntityViewModel;
+use KapitchiEntity\Service\EntityService;
+use KapitchiEntity\Exception\NotEntityException;
 
 /**
- *
+ * Action controller implementing common actions to manage entities:
+ * - indexAction() - list entities using Zend\Paginator
+ * - viewAction() - loads entity for readonly type rendering
+ * - createAction()
+ * - updateAction()
+ * - removeAction()
+ * 
+ * This works out-of-the-box with route set up in following way:
+ * <code>
+ *  'identity' => array(
+ *      'type'    => 'Segment',
+ *      'options' => array(
+ *          'route' => '/identity[/:action[/:id]]',
+ *          'constraints' => array(
+ *              'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+ *          ),
+ *          'defaults' => array(
+ *              'controller' => 'Identity',
+ *          ),
+ *      ),
+ *  ),
+ * </code>
+ * 
  * @author Matus Zeman <mz@kapitchi.com>
+ * @deprecated since version 0.1 This will be renamed to EntityController
  */
-abstract class AbstractEntityController extends AbstractActionController
+class AbstractEntityController extends AbstractActionController
 {
     protected $entityService;
     protected $entityForm;
     protected $entityViewModel;
     
-    abstract public function getUpdateUrl($entity);
-    abstract public function getIndexUrl();
+    /**
+     * Default implementation of this method returns entity update URL
+     * using matched route name and setting action = 'update', id = $entity->getId()
+     * If you have different routes set overwrite this method in your concrete controller
+     * 
+     * @deprecated since version 0.1 This method becomes protected
+     */
+    public function getUpdateUrl($entity)
+    {
+        if(!$this->getEntityService()->isEntityInstance($entity)) {
+            throw new NotEntityException();
+        }
+        
+        return $this->url()->fromRoute($this->getEvent()->getRouteMatch()->getMatchedRouteName(), array(
+            'action' => 'update', 'id' => $entity->getId()
+        ));
+    }
+    
+    /**
+     * Default implementation of this method returns entity index URL
+     * using matched route name and setting action = 'index'
+     * If you have different routes set overwrite this method in your concrete controller
+     * 
+     * @deprecated since version 0.1 This method becomes protected
+     */
+    public function getIndexUrl()
+    {
+        return $this->url()->fromRoute($this->getEvent()->getRouteMatch()->getMatchedRouteName(), array(
+            'action' => 'index'
+        ));
+    }
     
     public function getCurrentEntityId() {
         return $this->getEvent()->getRouteMatch()->getParam('id');
