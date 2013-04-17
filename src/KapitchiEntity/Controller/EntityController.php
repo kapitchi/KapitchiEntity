@@ -43,21 +43,12 @@ use KapitchiEntity\Exception\NotEntityException;
  * @author Matus Zeman <mz@kapitchi.com>
  * @deprecated since version 0.1 This will be renamed to EntityController
  */
-<<<<<<< HEAD:src/KapitchiEntity/Controller/EntityController.php
 class EntityController extends AbstractActionController
-=======
-class AbstractEntityController extends AbstractActionController
->>>>>>> a8ca74efddbca6ae87cac7e2ed1f6e21d962bdb4:src/KapitchiEntity/Controller/AbstractEntityController.php
 {
     protected $entityService;
     protected $entityForm;
     protected $entityViewModel;
     
-<<<<<<< HEAD:src/KapitchiEntity/Controller/EntityController.php
-    protected function getUpdateUrl($entity);
-    protected function getIndexUrl();
-   
-=======
     /**
      * Default implementation of this method returns entity update URL
      * using matched route name and setting action = 'update', id = $entity->getId()
@@ -65,7 +56,7 @@ class AbstractEntityController extends AbstractActionController
      * 
      * @deprecated since version 0.1 This method becomes protected
      */
-    public function getUpdateUrl($entity)
+    protected function getUpdateUrl($entity)
     {
         if(!$this->getEntityService()->isEntityInstance($entity)) {
             throw new NotEntityException();
@@ -83,14 +74,13 @@ class AbstractEntityController extends AbstractActionController
      * 
      * @deprecated since version 0.1 This method becomes protected
      */
-    public function getIndexUrl()
+    protected function getIndexUrl()
     {
         return $this->url()->fromRoute($this->getEvent()->getRouteMatch()->getMatchedRouteName(), array(
             'action' => 'index'
         ));
     }
     
->>>>>>> a8ca74efddbca6ae87cac7e2ed1f6e21d962bdb4:src/KapitchiEntity/Controller/AbstractEntityController.php
     public function getCurrentEntityId() {
         return $this->getEvent()->getRouteMatch()->getParam('id');
     }
