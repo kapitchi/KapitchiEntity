@@ -19,15 +19,15 @@ use Zend\Mvc\Controller\AbstractActionController,
  *
  * @author Matus Zeman <mz@kapitchi.com>
  */
-abstract class AbstractEntityController extends AbstractActionController
+class EntityController extends AbstractActionController
 {
     protected $entityService;
     protected $entityForm;
     protected $entityViewModel;
     
-    abstract public function getUpdateUrl($entity);
-    abstract public function getIndexUrl();
-    
+    protected function getUpdateUrl($entity);
+    protected function getIndexUrl();
+   
     public function getCurrentEntityId() {
         return $this->getEvent()->getRouteMatch()->getParam('id');
     }

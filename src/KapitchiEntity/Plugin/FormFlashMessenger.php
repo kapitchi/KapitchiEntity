@@ -47,9 +47,9 @@ class FormFlashMessenger implements PluginInterface
         
         $instance = $this;
         
-        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'update.persist', array($this, 'createMessages'), -1000);
-        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'create.persist', array($this, 'createMessages'), -1000);
-        $sharedEm->attach('KapitchiEntity\Controller\AbstractEntityController', 'remove.post', function($e) {
+        $sharedEm->attach('KapitchiEntity\Controller\EntityContoller', 'update.persist', array($this, 'createMessages'), -1000);
+        $sharedEm->attach('KapitchiEntity\Controller\EntityContoller', 'create.persist', array($this, 'createMessages'), -1000);
+        $sharedEm->attach('KapitchiEntity\Controller\EntityContoller', 'remove.post', function($e) {
             $cont = $e->getTarget();
             $fm = $cont->plugin('flashMessenger')->setNamespace('FormFlashMessenger');
             $fm->addMessage(array(
