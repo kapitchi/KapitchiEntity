@@ -14,30 +14,8 @@ namespace KapitchiEntity\Mapper;
  */
 class EntityDbAdapterMapperOptions extends \Zend\Stdlib\AbstractOptions
 {
-    protected $hydrator;
-    protected $entityPrototype;
     protected $tableName;
-    protected $primaryKey;
-    
-    public function getHydrator()
-    {
-        return $this->hydrator;
-    }
-
-    public function setHydrator($hydrator)
-    {
-        $this->hydrator = $hydrator;
-    }
-
-    public function getEntityPrototype()
-    {
-        return $this->entityPrototype;
-    }
-
-    public function setEntityPrototype($entityPrototype)
-    {
-        $this->entityPrototype = $entityPrototype;
-    }
+    protected $primaryKey = 'id';
 
     public function getTableName()
     {

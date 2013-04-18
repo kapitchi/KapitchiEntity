@@ -8,10 +8,12 @@
 
 namespace KapitchiEntity\Mapper;
 
-use ReflectionProperty,
-    Zend\Db\Sql\Select,
-    Zend\Db\Sql\Sql,
-    KapitchiBase\Mapper\DbAdapterMapper;
+use ReflectionProperty;
+use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Sql;
+use KapitchiBase\Mapper\DbAdapterMapper;
+use Zend\Db\Adapter\AdapterInterface;
+use Zend\Stdlib\Hydrator\HydratorInterface;
 
 class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInterface
 {
@@ -20,9 +22,14 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
      */
     protected $options;
     protected $resultSetPrototype;
+    protected $entityPrototype;
+    protected $entityHydrator;
 
-    public function __construct(AdapterInterface $dbAdapter, $entityPrototype, HydratorInterface $entityHydrator, EntityDbAdapterMapperOptions $options) {
+    public function __construct(AdapterInterface $dbAdapter, $entityPrototype, HydratorInterface $entityHydrator, $options) {
         parent::__construct($dbAdapter);
+        
+        $this->setEntityPrototype($entityPrototype);
+        $this->setEntityHydrator($entityHydrator);
         $this->setOptions($options);
     }
             
@@ -64,7 +71,7 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
     {
         if($this->resultSetPrototype === null) {
             $resultSet = new \Zend\Db\ResultSet\HydratingResultSet();
-            $resultSet->setHydrator($this->getHydrator());
+            $resultSet->setHydrator($this->getEntityHydrator());
             $resultSet->setObjectPrototype($this->getEntityPrototype());
             
             $this->resultSetPrototype = $resultSet;
@@ -131,7 +138,7 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
 
     protected function insert($entity)
     {
-        $hydrator = $this->getHydrator();
+        $hydrator = $this->getEntityHydrator();
         $set = $hydrator->extract($entity);
         $pkField = $this->getFieldForProperty($this->getPrimaryKey());
         unset($set[$pkField]);
@@ -151,7 +158,7 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
 
     protected function update($entity)
     {
-        $hydrator = $this->getHydrator();
+        $hydrator = $this->getEntityHydrator();
         $data = $hydrator->extract($entity);
         return $this->updateArray($data);
     }
@@ -214,24 +221,11 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
     }
 
     /**
-     * @return MappingHydrator
-     */
-    public function getHydrator()
-    {
-        return $this->getOptions()->getHydrator();
-    }
-
-    /**
      * @return string
      */
     public function getPrimaryKey()
     {
         return $this->getOptions()->getPrimaryKey();
-    }
-    
-    public function getEntityPrototype()
-    {
-        return $this->getOptions()->getEntityPrototype();
     }
 
     /**
@@ -241,13 +235,35 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
     {
         return $this->getOptions()->getTableName();
     }
+    
+    public function getEntityPrototype() {
+        return $this->entityPrototype;
+    }
 
-    /**
+    public function setEntityPrototype($entityPrototype) {
+        $this->entityPrototype = $entityPrototype;
+    }
+
+    public function getEntityHydrator() {
+        return $this->entityHydrator;
+    }
+
+    public function setEntityHydrator(HydratorInterface $entityHydrator) {
+        $this->entityHydrator = $entityHydrator;
+    }
+
+        /**
      * @param DefaultObjectManagerOptions $options
      */
-    public function setOptions(EntityDbAdapterMapperOptions $options)
+    public function setOptions($options)
     {
+             if(is_string($options)) {
+           new EntityDbAdapterMapperOptions(array(
+                            'tableName' => $options
+                        ));
+        }
         $this->options = $options;
+        
     }
 
     /**
