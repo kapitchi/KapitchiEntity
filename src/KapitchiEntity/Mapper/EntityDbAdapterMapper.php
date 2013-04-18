@@ -21,7 +21,7 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
     protected $options;
     protected $resultSetPrototype;
 
-    public function __construct($dbAdapter, EntityDbAdapterMapperOptions $options) {
+    public function __construct(AdapterInterface $dbAdapter, $entityPrototype, HydratorInterface $entityHydrator, EntityDbAdapterMapperOptions $options) {
         parent::__construct($dbAdapter);
         $this->setOptions($options);
     }
