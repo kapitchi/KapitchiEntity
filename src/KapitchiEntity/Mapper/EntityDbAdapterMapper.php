@@ -252,18 +252,18 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
         $this->entityHydrator = $entityHydrator;
     }
 
-        /**
-     * @param DefaultObjectManagerOptions $options
+    /**
+     * @param EntityDbAdapterMapperOptions|string $options if string it's tableName
      */
     public function setOptions($options)
     {
-             if(is_string($options)) {
-           new EntityDbAdapterMapperOptions(array(
-                            'tableName' => $options
-                        ));
+        if(is_string($options)) {
+            $options = new EntityDbAdapterMapperOptions(array(
+                'tableName' => $options
+            ));
         }
-        $this->options = $options;
         
+        $this->options = $options;
     }
 
     /**
