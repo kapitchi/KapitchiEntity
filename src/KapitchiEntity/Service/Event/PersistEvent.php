@@ -14,5 +14,8 @@ namespace KapitchiEntity\Service\Event;
  */
 class PersistEvent extends \Zend\EventManager\Event implements EntityServiceEventInterface
 {
-
+    public function getEntity()
+    {
+        return $this->getParam('entity');
+    }
 }

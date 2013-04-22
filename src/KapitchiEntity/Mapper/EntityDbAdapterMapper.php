@@ -39,6 +39,7 @@ class EntityDbAdapterMapper extends DbAdapterMapper implements EntityMapperInter
     public function select()
     {
         $select = new Select();
+        $select->from($this->getTableName());
         return $select;
     }
     
