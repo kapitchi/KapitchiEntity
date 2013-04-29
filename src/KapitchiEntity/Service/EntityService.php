@@ -191,7 +191,7 @@ class EntityService extends AbstractService
             throw new \Exception("Ambigious entity (count > 1) in EntityService::findOneBy()");
         }
         $items = $paginator->getCurrentItems();
-        return current($items);
+        return $items->current();
     }
     
     public function getOneBy(array $criteria)
