@@ -85,9 +85,14 @@ class EntityController extends AbstractActionController
         return $this->getEvent()->getRouteMatch()->getParam('id');
     }
 
+    /**
+     * We use 'id' from route match (see default entity route)
+     * Should return integer >= 1
+     * @return int
+     */
     public function getCurrentPageNumber()
     {
-        return $this->getRequest()->getQuery()->page;
+        return $this->getEvent()->getRouteMatch()->getParam('id', 1);
     }
     
     public function indexAction()
