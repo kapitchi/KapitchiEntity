@@ -161,6 +161,20 @@ class EntityController extends AbstractActionController
             'viewModel' => $viewModel,
         );
         
+        $submitLabel = 'Create';
+        //@todo mz: what's the best way to set form action?
+        //$form->setAttribute('action', '???');
+        $form->add(array(
+            'name' => 'submit',
+            'type' => 'Zend\Form\Element\Submit',
+            'options' => array(
+                'label' => $submitLabel,
+            ),
+            'attributes' => array(
+                'value' => $submitLabel,
+            )
+        ));
+        
         $this->getEventManager()->trigger('create.pre', $this, $eventParams);
         
         if($this->getRequest()->isPost()) {
@@ -193,9 +207,21 @@ class EntityController extends AbstractActionController
             throw new \KapitchiEntity\Exception\EntityNotFoundException("No entity found [id: '$id']");
         }
         
+        //@todo mz: translate
+        $submitLabel = 'Update';
         $form = $this->getEntityForm();
         $form->setAttribute('action', $this->getUpdateUrl($entity));
-        
+        $form->add(array(
+            'name' => 'submit',
+            'type' => 'Zend\Form\Element\Submit',
+            'options' => array(
+                'label' => $submitLabel,
+            ),
+            'attributes' => array(
+                'value' => $submitLabel,
+            )
+        ));
+
         $viewModel = $this->getEntityViewModel();
         $eventParams = array(
             'viewModel' => $viewModel,
