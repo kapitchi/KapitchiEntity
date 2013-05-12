@@ -29,7 +29,7 @@ use KapitchiEntity\Exception\NotEntityException;
  *  'identity' => array(
  *      'type'    => 'Segment',
  *      'options' => array(
- *          'route' => '/identity[/:action[/:id]]',
+ *          'route' => '/identity/:action[/:id]',
  *          'constraints' => array(
  *              'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
  *          ),
@@ -40,8 +40,10 @@ use KapitchiEntity\Exception\NotEntityException;
  *  ),
  * </code>
  * 
+ * :id is not restricted to integer values only as you might want to identify entities
+ * e.g. by Base 36 values encoded id values instead as KapEntityObfuscate does.
+ * 
  * @author Matus Zeman <mz@kapitchi.com>
- * @deprecated since version 0.1 This will be renamed to EntityController
  */
 class EntityController extends AbstractActionController
 {
@@ -53,8 +55,6 @@ class EntityController extends AbstractActionController
      * Default implementation of this method returns entity update URL
      * using matched route name and setting action = 'update', id = $entity->getId()
      * If you have different routes set overwrite this method in your concrete controller
-     * 
-     * @deprecated since version 0.1 This method becomes protected
      */
     protected function getUpdateUrl($entity)
     {
@@ -71,8 +71,6 @@ class EntityController extends AbstractActionController
      * Default implementation of this method returns entity index URL
      * using matched route name and setting action = 'index'
      * If you have different routes set overwrite this method in your concrete controller
-     * 
-     * @deprecated since version 0.1 This method becomes protected
      */
     protected function getIndexUrl()
     {

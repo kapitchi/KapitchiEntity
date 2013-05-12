@@ -66,6 +66,7 @@ class EntityRestfulController extends AbstractRestfulController {
         $service->persist($entity, $data);
         
         $ret = array(
+            'id' => $entity->getId(),
             'data' => $data,
             'entity' => $hydrator->extract($entity)
         );
@@ -79,9 +80,13 @@ class EntityRestfulController extends AbstractRestfulController {
     
     public function delete($id) {
         $service = $this->getEntityService();
-        $ret = $service->remove($id);
+        $entity = $service->get($id);
+        $ret = $service->remove($entity);
         
-        $jsonModel = new JsonModel($ret);
+        $jsonModel = new JsonModel(array(
+            'id' => $id,
+            'entity' => $service->createArrayFromEntity($entity)
+        ));
         $this->getEventManager()->trigger('delete.post', $this, array(
             'jsonViewModel' => $jsonModel
         ));
@@ -92,12 +97,7 @@ class EntityRestfulController extends AbstractRestfulController {
         $service = $this->getEntityService();
         $hydrator = $service->getHydrator();
         
-        $entity = $service->find($id);
-        if(!$entity) {
-            //TODO
-            throw new \Exception("TODO can not find entity #$id");
-        }
-        
+        $entity = $service->get($id);
         $ret = array(
             'id' => $id,
             'entity' => $hydrator->extract($entity),

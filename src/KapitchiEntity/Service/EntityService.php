@@ -208,7 +208,7 @@ class EntityService extends AbstractService
     {
         $mapper = $this->getMapper();
         
-        if(!is_object($entity)) {
+        if(!$this->isEntityInstance($entity)) {
             $entity = $mapper->find($entity);
             if(!$entity) {
                 throw new \KapitchiEntity\Exception\EntityNotFoundException("Entity does not exist #$id");
