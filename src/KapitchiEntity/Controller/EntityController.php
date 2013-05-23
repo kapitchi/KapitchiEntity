@@ -318,12 +318,10 @@ class EntityController extends AbstractActionController
             $form->setData($data);
             if($form->isValid()) {
                 $values = $form->getInputFilter()->getValues();
-                $entity = $service->createEntityFromArray($values);
-                $persistEvent = $service->persist($entity, $values);
+                $persistEvent = $service->persist($values);
                 
                 $ret = $cont->getEventManager()->trigger('create.persist.post', $cont, array(
                     'form' => $form,
-                    'entity' => $entity,
                     'persistEvent' => $persistEvent,
                 ), function($ret) {
                     return ($ret instanceof Response || $ret instanceof \Zend\View\Model\ModelInterface);
@@ -344,9 +342,7 @@ class EntityController extends AbstractActionController
             $form->setData($values);
             if($form->isValid()) {
                 $data = $form->getData();
-                $entity = $e->getParam('entity');
-                $service->getHydrator()->hydrate($data, $entity);
-                $e->setParam('persistEvent', $service->persist($entity, $data));
+                $e->setParam('persistEvent', $service->persist($data));
             }
         });
     }
