@@ -94,6 +94,29 @@ class EntityService extends AbstractService
         return $event;
     }
     
+    /**
+     * Updates ONLY values on entity passed in $data param
+     * 
+     * @param object|int $entity
+     * @param array $data
+     */
+    public function partialUpdate($entity, array $data) {
+        //ID? load entity first
+        if(!$this->isEntityInstance($entity)) {
+            $entity = $this->get($entity);
+        }
+        
+        $entityData = $this->createArrayFromEntity($entity);
+        $toUpdate = array_intersect_key($data, $entityData);
+        
+        if(empty($toUpdate)) {
+            throw new \InvalidArgumentException("Nothing to update");
+        }
+        
+        $this->getHydrator()->hydrate($toUpdate, $entity);
+        return $this->persist($entity);
+    }
+    
     public function createPersistEvent(array $params)
     {
         return new Event\PersistEvent('persist', $this, $params);

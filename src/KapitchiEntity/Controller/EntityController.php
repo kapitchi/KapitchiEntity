@@ -204,11 +204,7 @@ class EntityController extends AbstractActionController
         $id = $this->getCurrentEntityId();
         $service = $this->getEntityService();
         
-        $entity = $service->find($id);
-        if(!$entity) {
-            //TODO
-            throw new \KapitchiEntity\Exception\EntityNotFoundException("No entity found [id: '$id']");
-        }
+        $entity = $service->get($id);
         
         //@todo mz: translate
         $submitLabel = 'Update';
