@@ -8,8 +8,9 @@
 
 namespace KapitchiEntity\Plugin;
 
-use Zend\EventManager\EventInterface,
-    KapitchiApp\PluginManager\PluginInterface;
+use Zend\EventManager\EventInterface;
+use KapitchiApp\PluginManager\PluginInterface;
+use Zend\Mvc\Controller\Plugin\FlashMessenger;
 
 /**
  * @todo This needs to be rewritten to use ControllerPluginManager directly
@@ -18,6 +19,8 @@ use Zend\EventManager\EventInterface,
  */
 class FormFlashMessenger implements PluginInterface
 {
+    protected $namespace = 'userMessages';
+    protected $eventId = 'KapitchiEntity\Controller\EntityController';
     
     public function getAuthor()
     {
@@ -47,14 +50,12 @@ class FormFlashMessenger implements PluginInterface
         
         $instance = $this;
         
-        $sharedEm->attach('KapitchiEntity\Controller\EntityContoller', 'update.persist', array($this, 'createMessages'), -1000);
-        $sharedEm->attach('KapitchiEntity\Controller\EntityContoller', 'create.persist', array($this, 'createMessages'), -1000);
-        $sharedEm->attach('KapitchiEntity\Controller\EntityContoller', 'remove.post', function($e) {
+        $sharedEm->attach($this->eventId, 'update.persist', array($this, 'createMessages'), -10);
+        $sharedEm->attach($this->eventId, 'create.persist', array($this, 'createMessages'), -10);
+        $sharedEm->attach($this->eventId, 'remove.post', function($e) {
             $cont = $e->getTarget();
-            $fm = $cont->plugin('flashMessenger')->setNamespace('FormFlashMessenger');
-            $fm->addMessage(array(
-                'message' => "Item deleted",
-            ));
+            $fm = $cont->plugin('flashMessenger')->setNamespace(FlashMessenger::NAMESPACE_INFO);
+            $fm->addMessage('Item deleted');
         });
     }
     
@@ -64,19 +65,17 @@ class FormFlashMessenger implements PluginInterface
 
         $inputFilter = $form->getInputFilter();
         $msgs = $inputFilter->getMessages();
-        $fm = $cont->plugin('flashMessenger')->setNamespace('FormFlashMessenger');
         if(!empty($msgs)) {
+            $fm = $cont->plugin('flashMessenger')->setNamespace(FlashMessenger::NAMESPACE_ERROR);
             $fm->addMessage(array(
                 'message' => "Form validation error",
                 'sticky' => true,
-                'theme' => 'warning',
                 'inputFilterMessages' => $msgs
             ));
         }
         else {
-            $fm->addMessage(array(
-                'message' => "Item saved",
-            ));
+            $fm = $cont->plugin('flashMessenger')->setNamespace(FlashMessenger::NAMESPACE_SUCCESS);
+            $fm->addMessage("Item saved");
         }
     }
     
