@@ -49,14 +49,12 @@ class EntityService extends AbstractService
     
     public function persist($entity, $data = null)
     {
-        if(!is_object($entity)) {
-            if(is_array($entity)) {
-                $data = $entity;
-                $entity = $this->createEntityFromArray($entity);
-            }
-            else {
-                throw new \KapitchiEntity\Exception\NotEntityException("Not an entity");
-            }
+        if(is_array($entity)) {
+            $data = $entity;
+            $entity = $this->createEntityFromArray($entity);
+        }
+        elseif(!$this->isEntityInstance($entity)) {
+            throw new \KapitchiEntity\Exception\NotEntityException("Not an entity");
         }
         
         $mapper = $this->getMapper();
@@ -71,10 +69,12 @@ class EntityService extends AbstractService
             );
             
             //TODO excepts entity to have "id" we need EntityInterface - getId/setId!
-            $entityId = $entity->getId();
-            if($entityId) {
-                $params['origEntity'] = $this->getMapper()->find($entityId);
-            }
+            //mz: this is overkill here and is deprecated
+            //@deprecated
+//            $entityId = $entity->getId();
+//            if($entityId) {
+//                $params['origEntity'] = $this->getMapper()->find($entityId);
+//            }
             //END
             
             $event = $this->createPersistEvent($params);
@@ -108,7 +108,6 @@ class EntityService extends AbstractService
         
         $entityData = $this->createArrayFromEntity($entity);
         $toUpdate = array_intersect_key($data, $entityData);
-        
         if(empty($toUpdate)) {
             throw new \InvalidArgumentException("Nothing to update");
         }
