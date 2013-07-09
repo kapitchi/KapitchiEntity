@@ -56,7 +56,7 @@ class EntityController extends AbstractActionController
      * using matched route name and setting action = 'update', id = $entity->getId()
      * If you have different routes set overwrite this method in your concrete controller
      */
-    protected function getUpdateUrl($entity)
+    public function getUpdateUrl($entity)
     {
         if(!$this->getEntityService()->isEntityInstance($entity)) {
             throw new NotEntityException();
@@ -72,7 +72,7 @@ class EntityController extends AbstractActionController
      * using matched route name and setting action = 'index'
      * If you have different routes set overwrite this method in your concrete controller
      */
-    protected function getIndexUrl()
+    public function getIndexUrl()
     {
         return $this->url()->fromRoute($this->getEvent()->getRouteMatch()->getMatchedRouteName(), array(
             'action' => 'index'
@@ -243,11 +243,8 @@ class EntityController extends AbstractActionController
             $this->getEventManager()->trigger('update.load', $this, $eventParams);
         }
         
-        $model = $this->getEntityService()->loadModel($entity);
-        
         $viewModel->setVariables(array(
             'entity' => $entity,
-            'model' => $model,//DEPRECATED - we probably delete whole model stuff
             'form' => $form,
         ));
         
