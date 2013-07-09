@@ -248,7 +248,6 @@ class EntityController extends AbstractActionController
             'form' => $form,
         ));
         
-        $eventParams['model'] = $model;
         $eventParams['viewModel'] = $viewModel;
         $this->getEventManager()->trigger('update.post', $this, $eventParams);
 
