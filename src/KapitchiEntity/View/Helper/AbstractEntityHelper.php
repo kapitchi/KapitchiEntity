@@ -44,6 +44,11 @@ class AbstractEntityHelper extends \Zend\View\Helper\AbstractHelper
         return $this->getEntityService()->find($id);
     }
     
+    public function get($id)
+    {
+        return $this->getEntityService()->get($id);
+    }
+    
     public function toArray($entity, array $data = null)
     {
         $ret = $this->getEntityService()->createArrayFromEntity($entity);
