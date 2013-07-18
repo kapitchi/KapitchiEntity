@@ -29,12 +29,12 @@ class FormFlashMessenger implements PluginInterface
 
     public function getDescription()
     {
-        return 'TODO';
+        return 'Implementation of generic user messages for EntityController actions.';
     }
 
     public function getName()
     {
-        return '[KapitchiContact] Form flash messenger error messages';
+        return '[KapitchiEntity] Entity controller action messages';
     }
 
     public function getVersion()
