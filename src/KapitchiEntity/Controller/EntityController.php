@@ -72,11 +72,12 @@ class EntityController extends AbstractActionController
      * using matched route name and setting action = 'index'
      * If you have different routes set overwrite this method in your concrete controller
      */
-    public function getIndexUrl()
+    public function getIndexUrl(array $params = array(), array $options = array())
     {
-        return $this->url()->fromRoute($this->getEvent()->getRouteMatch()->getMatchedRouteName(), array(
-            'action' => 'index'
-        ));
+        return $this->url()->fromRoute($this->getEvent()->getRouteMatch()->getMatchedRouteName(),
+            array_merge(array('action' => 'index'), $params),
+            $options
+        );
     }
     
     public function getCurrentEntityId() {
@@ -287,7 +288,8 @@ class EntityController extends AbstractActionController
         $instance = $this;
         
         $events->attach('remove.post', function($e) use ($instance) {
-            return $instance->redirect()->toUrl($instance->getIndexUrl());
+            $page = $instance->getRequest()->getQuery()->get('redirect_page', 1);
+            return $instance->redirect()->toUrl($instance->getIndexUrl(array(), array('query' => array('page' => $page))));
         });
         
         $events->attach('create.persist.post', function($e) use ($instance) {
