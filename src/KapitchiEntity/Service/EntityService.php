@@ -301,20 +301,6 @@ class EntityService extends AbstractService
      * @param \KapitchiEntity\Model\EntityModelInterface $model - used when extending classes creates different Model instances
      * @return \KapitchiEntity\Model\GenericEntityModel
      */
-    public function loadModel($entity, $options = array(), EntityModelInterface $model = null)
-    {
-        if($model === null) {
-            $model = new \KapitchiEntity\Model\GenericEntityModel($entity);
-        }
-        
-        $this->triggerEvent('loadModel', array(
-            'model' => $model,
-            'entity' => $entity,
-            'options' => $options
-        ));
-        
-        return $model;
-    }
     
     public function setEventManager(EventManagerInterface $events)
     {
