@@ -21,7 +21,7 @@
     "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
-        "kapitchi/base": "dev-master"
+        "kapitchi/base": "0.1.*"
     },
     "autoload": {
         "psr-0": {
