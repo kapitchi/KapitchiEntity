@@ -321,20 +321,25 @@ class EntityService extends AbstractService
         }, 1);
         
         //validate entity before persist if inputfilter is available
-        $events->attach('persist', function($e) use ($instance) {
-            $inputFilter = $instance->getInputFilter();
-            if($inputFilter) {
-                $entity = $e->getParam('entity');
-                $data = $instance->getHydrator()->extract($entity);
-                $inputFilter->setData($data);
-                if(!$inputFilter->isValid()) {
-                    $e = new \KapitchiEntity\Exception\ValidationException("Validation failed");
-                    $e->setEntity($entity);
-                    $e->setInputFilter($inputFilter);
-                    throw $e;
-                }
-            }
-        }, 10);
+//        $events->attach('persist', function($e) use ($instance) {
+//            $inputFilter = $instance->getInputFilter();
+//            if($inputFilter) {
+//                $entity = $e->getParam('entity');
+//                $data = $instance->getHydrator()->extract($entity);
+//                $inputFilter->setData($data);
+//                $inputFilter->isValid();
+//                $msg = $inputFilter->getMessages();
+//                echo __FILE__ . ' Line: ' . __LINE__; var_dump($inputFilter->get('fromTime')->getFilterChain()->getFilters()->toArray()); exit; //XXX
+//                //echo __FILE__ . ' Line: ' . __LINE__; var_dump($inputFilter->get('timeFrom')->getFilterChain()->getFilters()->toArray()); exit; //XXX
+//                echo __FILE__ . ' Line: ' . __LINE__; var_dump($msg); var_dump($data); exit; //XXX
+//                if(!$inputFilter->isValid()) {
+//                    $e = new \KapitchiEntity\Exception\ValidationException("Validation failed");
+//                    $e->setEntity($entity);
+//                    $e->setInputFilter($inputFilter);
+//                    throw $e;
+//                }
+//            }
+//        }, 10);
         
         $events->attach('remove', function($e) use ($mapper) {
             return $mapper->remove($e->getParam('entity'));
