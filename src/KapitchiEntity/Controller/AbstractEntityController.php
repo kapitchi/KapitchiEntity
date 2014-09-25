@@ -73,9 +73,11 @@ abstract class AbstractEntityController extends AbstractActionController
         $viewModel = $this->getEntityViewModel();
         
         $form = $this->getEntityForm();
-        $form->setAttribute('readonly', true);
-        $form->setAttribute('action', '#');
-        $form->setData($service->createArrayFromEntity($entity));
+        if($form) {
+            $form->setAttribute('readonly', true);
+            $form->setAttribute('action', '#');
+            $form->setData($service->createArrayFromEntity($entity));
+        }
         
         $viewModel->setVariables(array(
             'entity' => $entity,
