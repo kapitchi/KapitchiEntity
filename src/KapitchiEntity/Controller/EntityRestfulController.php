@@ -78,7 +78,6 @@ class EntityRestfulController extends AbstractRestfulController {
     
     public function get($id) {
         $service = $this->getEntityService();
-        $hydrator = $service->getHydrator();
         
         $entity = $service->find($id);
         if(!$entity) {
@@ -88,7 +87,7 @@ class EntityRestfulController extends AbstractRestfulController {
         
         $ret = array(
             'id' => $id,
-            'entity' => $hydrator->extract($entity),
+            'entity' => $this->renderEntity($entity)
         );
         
         $jsonModel = new JsonModel($ret);
@@ -101,14 +100,20 @@ class EntityRestfulController extends AbstractRestfulController {
 
     public function getList() {
         $service = $this->getEntityService();
-        $hydrator = $service->getHydrator();
+
+        $criteria = null;
         
-        //TODO paginator params
-        $paginator = $service->getPaginator();
+        //angularjs
+        $jsonCriteriaString = $this->params()->fromQuery('json_criteria', null);
+        if($jsonCriteriaString) {
+            $criteria = json_decode($jsonCriteriaString, true);
+        }
+            
+        $paginator = $service->getPaginator($criteria);
         
         $entities = array();
         foreach($paginator as $item) {
-            $entities[] = $hydrator->extract($item);
+            $entities[] = $this->renderEntity($item);
         }
         
         $ret = array(
@@ -122,6 +127,18 @@ class EntityRestfulController extends AbstractRestfulController {
             'jsonViewModel' => $jsonModel,
         ));
         return $jsonModel;
+    }
+    
+    protected function renderEntity($item)
+    {
+        $hydrator =  $this->getEntityService()->getHydrator();
+        
+        $array = new \ArrayObject($hydrator->extract($item));
+        $this->getEventManager()->trigger('renderEntity', $this, array(
+            'data' => $array,
+        ));
+        
+        return $array;
     }
 
     public function update($id, $data) {
