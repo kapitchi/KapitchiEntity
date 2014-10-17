@@ -122,6 +122,11 @@ class EntityService extends AbstractService
         throw new \KapitchiEntity\Exception\EntityNotFoundException("Entity not found");
     }
     
+    public function getArray($priKey)
+    {
+        return $this->createArrayFromEntity($this->get($priKey));
+    }
+
     /**
      * 
      * @param array $criteria
