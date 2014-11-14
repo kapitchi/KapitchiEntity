@@ -96,6 +96,7 @@ abstract class AbstractEntityController extends AbstractActionController
     public function createAction()
     {
         $form = $this->getEntityForm();
+        $form->setAttribute('action', $_SERVER['REQUEST_URI']);
         $viewModel = $this->getEntityViewModel();
         
         $eventParams = array(
@@ -134,6 +135,7 @@ abstract class AbstractEntityController extends AbstractActionController
             //TODO
             throw new \KapitchiEntity\Exception\EntityNotFoundException("No entity found [id: '$id']");
         }
+        
         
         $form = $this->getEntityForm();
         $form->setAttribute('action', $this->getUpdateUrl($entity));
